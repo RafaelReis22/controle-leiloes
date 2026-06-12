@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' · Controle de Leilões'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="app-header" th:fragment="header">
+        <div class="header-container">
+            <a th:href="@{/leiloes}" class="logo-link">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">Controle de Leilões</span>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li>
+                        <a th:href="@{/lotes}" class="nav-link">Lotes</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/leiloes}" class="nav-link">Leilões</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <footer class="footer" th:fragment="footer">
+        <p>© 2026 Controle de Leilões · Trabalho Final PSA · 2026/1</p>
+    </footer>
+</body>
+</html>

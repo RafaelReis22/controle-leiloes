@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Erro no Servidor')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+        <div class="section-box" style="max-width: 500px; text-align: center; padding: 3rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05); border-radius: 12px; border-top: 4px solid #ef4444;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">💥</div>
+            <h1 class="page-title" style="font-size: 2rem; margin-bottom: 0.5rem; color: #ef4444;">500 - Erro Interno</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;" th:text="${mensagem != null ? mensagem : 'Ocorreu um erro interno inesperado no servidor. Nossa equipe técnica já foi notificada.'}">Algo deu errado.</p>
+            <a th:href="@{/leiloes}" class="btn btn-primary">Voltar para Início</a>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

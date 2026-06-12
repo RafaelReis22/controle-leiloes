@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Dar Lance')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main">
+        <div class="page-header" style="max-width: 650px; margin: 0 auto 2.5rem auto;">
+            <div class="page-title-section">
+                <h1 class="page-title">Dar Lance no Leilão #<span th:text="${idLeilao}">1</span></h1>
+                <p class="page-subtitle">Preencha os campos abaixo com o seu usuário e o valor da sua oferta.</p>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <!-- Banner de erro genérico caso ocorra alguma exceção de validação de negócios (ex: lance abaixo do mínimo) -->
+            <div th:if="${erro}" style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; color: #ef4444; font-weight: 500;">
+                ⚠️ <span th:text="${erro}">Ocorreu um erro ao registrar o lance.</span>
+            </div>
+
+            <form th:action="@{/leiloes/{id}/lance(id=${idLeilao})}" th:object="${lance}" method="post">
+                <!-- ID do leilão em campo oculto para validação e processamento -->
+                <input type="hidden" th:field="*{idLeilao}" />
+
+                <div class="form-group">
+                    <label for="idUsuario" class="form-label">Selecione seu Usuário</label>
+                    <select id="idUsuario" th:field="*{idUsuario}" class="form-control">
+                        <option value="" disabled selected>Quem está dando o lance...</option>
+                        <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome} + ' (CPF/CNPJ: ' + ${usuario.cpfCnpj} + ')'">Usuário</option>
+                    </select>
+                    <span class="form-error" th:if="${#fields.hasErrors('idUsuario')}" th:errors="*{idUsuario}">Erro de usuário</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="valor" class="form-label">Valor da Oferta (R$)</label>
+                    <input type="number" step="0.01" id="valor" th:field="*{valor}" class="form-control" placeholder="0.00" required>
+                    <span class="form-error" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}">Erro de valor</span>
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/leiloes/{id}(id=${idLeilao})}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">💸 Confirmar Lance</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

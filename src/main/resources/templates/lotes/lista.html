@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Lista de Lotes')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main">
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1 class="page-title">Lotes Cadastrados</h1>
+                <p class="page-subtitle">Visualize os lotes de bens cadastrados no sistema.</p>
+            </div>
+            <a th:href="@{/lotes/novo}" class="btn btn-primary">➕ Novo Lote</a>
+        </div>
+
+        <div th:if="${lotes.empty}" class="section-box" style="text-align: center; padding: 3rem;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Nenhum lote cadastrado até o momento.</p>
+            <a th:href="@{/lotes/novo}" class="btn btn-secondary">Cadastrar Primeiro Lote</a>
+        </div>
+
+        <div class="cards-grid" th:unless="${lotes.empty}">
+            <div class="card" th:each="lote : ${lotes}">
+                <div class="card-body">
+                    <span class="card-tag">LOTE DE BENS</span>
+                    <h2 class="card-title" th:text="${lote.descricao}">Descrição do Lote</h2>
+                    
+                    <div class="card-meta">
+                        <div class="meta-row">
+                            <span class="meta-label">Responsável:</span>
+                            <span class="meta-value" th:text="${lote.nomeResponsavel}">Nome</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Total de Bens:</span>
+                            <span class="meta-value" th:text="${lote.quantidadeBens} + ' item(ns)'">0 itens</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Preço Mínimo:</span>
+                            <span class="meta-value price" th:text="${#numbers.formatCurrency(lote.precoMinimo)}">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/lotes/{id}(id=${lote.id})}" class="card-link">Ver detalhes ➔</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Detalhes do Lote')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main">
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1 class="page-title">Detalhes do Lote #<span th:text="${lote.id}">1</span></h1>
+                <p class="page-subtitle">Visualize informações detalhadas do lote e seus bens associados.</p>
+            </div>
+            <a th:href="@{/lotes}" class="btn btn-secondary">⬅️ Voltar para Lista</a>
+        </div>
+
+        <div class="details-container">
+            <div class="details-main">
+                <div class="section-box">
+                    <h2 class="section-box-title">Descrição do Lote</h2>
+                    <p style="white-space: pre-line; color: var(--text-primary);" th:text="${lote.descricao}">Descrição...</p>
+                </div>
+
+                <div class="section-box">
+                    <h2 class="section-box-title">Bens Integrantes do Lote (<span th:text="${lote.quantidadeDeBens()}">0</span>)</h2>
+                    
+                    <div th:if="${lote.bens.empty}" style="text-align: center; color: var(--text-secondary); padding: 1rem 0;">
+                        Este lote não possui bens associados.
+                    </div>
+
+                    <div class="items-list" th:unless="${lote.bens.empty}">
+                        <div class="item-row" th:each="bem : ${lote.bens}">
+                            <div class="item-icon">📦</div>
+                            <div class="item-details">
+                                <span class="item-title" th:text="${bem.descricaoBreve}">Descrição Breve</span>
+                                <span class="item-desc" style="margin-top: 0.25rem;" th:text="${bem.descricaoCompleta}">Descrição Completa</span>
+                                <span class="card-tag" style="margin-top: 0.5rem; font-size: 0.7rem;" th:text="${bem.categoria.nome}">Categoria</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-sidebar">
+                <div class="section-box">
+                    <h2 class="section-box-title">Informações Gerais</h2>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Preço Mínimo</span>
+                            <span class="meta-value price" style="font-size: 1.5rem;" th:text="${#numbers.formatCurrency(lote.precoMinimo)}">R$ 0,00</span>
+                        </div>
+                        
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Usuário Responsável</span>
+                            <span class="meta-value" style="font-size: 1.1rem; display: block;" th:text="${lote.responsavel.nome}">Nome</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;" th:text="${lote.responsavel.email}">Email</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;" th:text="'Documento: ' + ${lote.responsavel.cpfCnpj}">Documento</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

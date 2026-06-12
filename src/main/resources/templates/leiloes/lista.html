@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Lista de Leilões')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main">
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1 class="page-title">Leilões Cadastrados</h1>
+                <p class="page-subtitle">Acompanhe e participe de leilões abertos e fechados.</p>
+            </div>
+            <a th:href="@{/leiloes/novo}" class="btn btn-primary">➕ Novo Leilão</a>
+        </div>
+
+        <div th:if="${leiloes.empty}" class="section-box" style="text-align: center; padding: 3rem;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Nenhum leilão cadastrado até o momento.</p>
+            <a th:href="@{/leiloes/novo}" class="btn btn-secondary">Cadastrar Primeiro Leilão</a>
+        </div>
+
+        <div class="cards-grid" th:unless="${leiloes.empty}">
+            <div class="card" th:each="leilao : ${leiloes}">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="card-tag" th:text="'LEILÃO ' + ${leilao.tipo}">TIPO</span>
+                        
+                        <!-- Badges com base no status do leilão -->
+                        <span th:if="${leilao.status().name() == 'AGUARDANDO'}" class="badge badge-aguardando">Aguardando</span>
+                        <span th:if="${leilao.status().name() == 'EM_ANDAMENTO'}" class="badge badge-andamento">Em Andamento</span>
+                        <span th:if="${leilao.status().name() == 'ENCERRADO'}" class="badge badge-encerrado">Encerrado</span>
+                    </div>
+
+                    <h2 class="card-title" th:text="${leilao.descricaoLote}">Descrição do Lote</h2>
+                    
+                    <div class="card-meta">
+                        <div class="meta-row">
+                            <span class="meta-label">Organizador:</span>
+                            <span class="meta-value" th:text="${leilao.nomeResponsavel}">Nome</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Início:</span>
+                            <span class="meta-value" th:text="${#temporals.format(leilao.dataInicio, 'dd/MM/yyyy HH:mm')}">01/01/2026 00:00</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Término:</span>
+                            <span class="meta-value" th:text="${#temporals.format(leilao.dataTermino, 'dd/MM/yyyy HH:mm')}">01/01/2026 00:00</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Lances recebidos:</span>
+                            <span class="meta-value" th:text="${leilao.totalLances}">0</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Lance Mínimo:</span>
+                            <span class="meta-value price" th:text="${#numbers.formatCurrency(leilao.precoMinimo)}">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{/leiloes/{id}(id=${leilao.id})}" class="card-link">Acessar Leilão ➔</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>

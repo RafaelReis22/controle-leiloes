@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head(title='Detalhes do Leilão')}"></head>
+<body>
+    <header th:replace="~{layout/base :: header}"></header>
+
+    <main class="app-main">
+        <div class="page-header">
+            <div class="page-title-section">
+                <h1 class="page-title">Painel do Leilão #<span th:text="${leilao.id}">1</span></h1>
+                <p class="page-subtitle">Acompanhe as informações e o histórico de lances.</p>
+            </div>
+            <a th:href="@{/leiloes}" class="btn btn-secondary">⬅️ Voltar para Lista</a>
+        </div>
+
+        <!-- Banner de Vencedor para Leilões Encerrados -->
+        <div th:if="${leilao.status.name() == 'ENCERRADO'}" style="margin-bottom: 2.5rem;">
+            <div th:if="${leilao.lanceVencedor != null}" class="winner-banner">
+                <div class="winner-title">🏆 LEILÃO ENCERRADO - LANCE VENCEDOR</div>
+                <div class="winner-name" th:text="'Parabéns para ' + ${leilao.lanceVencedor.nomeUsuario} + '!'">Parabéns!</div>
+                <div class="winner-value" th:text="${#numbers.formatCurrency(leilao.lanceVencedor.valor)}">R$ 0,00</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);" th:text="'Arrematado em: ' + ${#temporals.format(leilao.lanceVencedor.dataHora, 'dd/MM/yyyy HH:mm:ss')}">01/01/2026</div>
+            </div>
+            <div th:if="${leilao.lanceVencedor == null}" class="winner-banner" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+                <div class="winner-title" style="color: var(--color-danger);">🔒 LEILÃO ENCERRADO SEM LANCES</div>
+                <div class="winner-name" style="font-size: 1.1rem; color: var(--text-secondary);">Não houve ofertas para este lote antes do término.</div>
+            </div>
+        </div>
+
+        <div class="details-container">
+            <div class="details-main">
+                <div class="section-box">
+                    <h2 class="section-box-title">Descrição do Lote Leiloado</h2>
+                    <p style="white-space: pre-line; color: var(--text-primary);" th:text="${leilao.descricaoLote}">Descrição...</p>
+                </div>
+
+                <!-- Histórico de Lances -->
+                <div class="section-box">
+                    <h2 class="section-box-title">Histórico de Lances</h2>
+
+                    <!-- Regra de Visibilidade ABERTO -->
+                    <div th:if="${leilao.tipo.name() == 'ABERTO'}">
+                        <div th:if="${leilao.lancesVisiveis.empty}" style="text-align: center; color: var(--text-secondary); padding: 1.5rem 0;">
+                            Ainda não há lances registrados para este leilão. Seja o primeiro a ofertar!
+                        </div>
+                        
+                        <div class="lances-timeline" th:unless="${leilao.lancesVisiveis.empty}">
+                            <div class="lance-card" th:each="lance, iter : ${leilao.lancesVisiveis}" th:classappend="${iter.first ? 'first' : ''}">
+                                <div class="lance-user-info">
+                                    <span class="lance-user-name" th:text="${lance.nomeUsuario}">Nome do Usuário</span>
+                                    <span class="lance-time" th:text="${#temporals.format(lance.dataHora, 'dd/MM/yyyy HH:mm:ss')}">Data/Hora</span>
+                                </div>
+                                <span class="lance-value" th:text="${#numbers.formatCurrency(lance.valor)}">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Regra de Visibilidade FECHADO (Em Andamento) -->
+                    <div th:if="${leilao.tipo.name() == 'FECHADO' and leilao.status.name() == 'EM_ANDAMENTO'}" style="text-align: center; padding: 2rem 0;">
+                        <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">⏳</span>
+                        <p style="color: var(--color-warning); font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem;">Leilão do Tipo Fechado</p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Os lances registrados estão ocultos e serão revelados apenas quando o leilão for encerrado.</p>
+                    </div>
+
+                    <!-- Regra de Visibilidade FECHADO (Encerrado) -->
+                    <div th:if="${leilao.tipo.name() == 'FECHADO' and leilao.status.name() == 'ENCERRADO'}">
+                        <div th:if="${leilao.lancesVisiveis.empty}" style="text-align: center; color: var(--text-secondary); padding: 1.5rem 0;">
+                            Nenhum lance foi registrado para este leilão fechado.
+                        </div>
+                        
+                        <div class="lances-timeline" th:unless="${leilao.lancesVisiveis.empty}">
+                            <div class="lance-card" th:each="lance, iter : ${leilao.lancesVisiveis}" th:classappend="${iter.first ? 'first' : ''}">
+                                <div class="lance-user-info">
+                                    <span class="lance-user-name" th:text="${lance.nomeUsuario}">Nome do Usuário</span>
+                                    <span class="lance-time" th:text="${#temporals.format(lance.dataHora, 'dd/MM/yyyy HH:mm:ss')}">Data/Hora</span>
+                                </div>
+                                <span class="lance-value" th:text="${#numbers.formatCurrency(lance.valor)}">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-sidebar">
+                <!-- Painel de Ação -->
+                <div class="section-box" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Status do Leilão</span>
+                        <span th:if="${leilao.status.name() == 'AGUARDANDO'}" class="badge badge-aguardando" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Aguardando</span>
+                        <span th:if="${leilao.status.name() == 'EM_ANDAMENTO'}" class="badge badge-andamento" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Em Andamento</span>
+                        <span th:if="${leilao.status.name() == 'ENCERRADO'}" class="badge badge-encerrado" style="font-size: 0.85rem; padding: 0.5rem 1rem;">Encerrado</span>
+                    </div>
+
+                    <!-- Botão de Dar Lance -->
+                    <div th:if="${leilao.status.name() == 'EM_ANDAMENTO'}">
+                        <a th:href="@{/leiloes/{id}/lance(id=${leilao.id})}" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 0.9rem;">💸 Oferecer Lance</a>
+                    </div>
+                    <div th:if="${leilao.status.name() == 'AGUARDANDO'}" class="badge badge-aguardando" style="width: 100%; justify-content: center; font-size: 0.9rem; padding: 0.8rem;">
+                        ⏳ Brevemente Iniciará
+                    </div>
+                    <div th:if="${leilao.status.name() == 'ENCERRADO'}" class="badge badge-encerrado" style="width: 100%; justify-content: center; font-size: 0.9rem; padding: 0.8rem;">
+                        🔒 Leilão Encerrado
+                    </div>
+                </div>
+
+                <!-- Painel de Informações -->
+                <div class="section-box">
+                    <h2 class="section-box-title">Informações Adicionais</h2>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Preço Mínimo do Lote</span>
+                            <span class="meta-value price" style="font-size: 1.35rem;" th:text="${#numbers.formatCurrency(leilao.precoMinimo)}">R$ 0,00</span>
+                        </div>
+
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Modalidade</span>
+                            <span class="meta-value" style="font-size: 1rem;" th:text="'LEILÃO ' + ${leilao.tipo}">Tipo</span>
+                        </div>
+
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Leiloeiro Responsável</span>
+                            <span class="meta-value" style="font-size: 1.1rem; display: block;" th:text="${leilao.nomeResponsavel}">Nome</span>
+                        </div>
+                        
+                        <div>
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Cronograma</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;" th:text="'Início: ' + ${#temporals.format(leilao.dataInicio, 'dd/MM/yyyy HH:mm')}">Início</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;" th:text="'Fim: ' + ${#temporals.format(leilao.dataTermino, 'dd/MM/yyyy HH:mm')}">Término</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{layout/base :: footer}"></footer>
+</body>
+</html>
