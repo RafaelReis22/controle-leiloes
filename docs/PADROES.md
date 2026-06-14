@@ -34,9 +34,11 @@ As entidades de domínio localizadas no pacote `com.leiloes.domain.model` não s
 - [Usuario.java](../src/main/java/com/leiloes/domain/model/Usuario.java) contém comportamento para diferenciar o formato de CPF ou CNPJ.
 
 ### 3. Repository Pattern (Encapsulamento de Persistência)
-Toda a comunicação com o banco de dados PostgreSQL é encapsulada em interfaces no pacote `com.leiloes.repository` estendendo o `JpaRepository` do Spring Data JPA. Isso permite isolar a persistência da lógica do negócio:
-- Consultas customizadas utilizando `SELECT NEW` em [LeilaoRepository](../src/main/java/com/leiloes/repository/LeilaoRepository.java) evitam o problema de performance do N+1 ao mapear joins complexos diretamente para DTOs.
-- Interface de projeção em [LanceVencedorProjection](../src/main/java/com/leiloes/repository/LanceVencedorProjection.java) é utilizada para recuperar de forma ultra-rápida o lance vencedor diretamente da consulta nativa no banco.
+Toda a comunicação com o banco de dados PostgreSQL é encapsulada em interfaces no pacote `com.leiloes.repository` estendendo o `JpaRepository` do Spring Data JPA. Isso permite isolar completamente a persistência da lógica de negócio:
+
+- **`SELECT NEW` (JPQL)** em [LeilaoRepository](../src/main/java/com/leiloes/repository/LeilaoRepository.java) projeta joins complexos diretamente nos DTOs de saída em uma única query, eliminando o problema N+1 que ocorreria ao carregar entidades completas com relações lazy.
+- **`@Lock(LockModeType.PESSIMISTIC_WRITE)`** em `findByIdForUpdate()` emite um `SELECT ... FOR UPDATE` no PostgreSQL, bloqueando a linha do leilão durante o registro do lance e eliminando a *race condition* em lances simultâneos.
+- **Query nativa com `LIMIT 1`** em [LanceRepository](../src/main/java/com/leiloes/repository/LanceRepository.java) recupera o lance vencedor diretamente no banco. JPQL não suporta `LIMIT`, por isso a query é nativa; e como queries nativas não permitem `SELECT NEW`, o resultado é mapeado via interface de projeção [LanceVencedorProjection](../src/main/java/com/leiloes/repository/LanceVencedorProjection.java), que o Spring Data preenche automaticamente por proxy.
 
 ### 4. Specification Pattern (Validações desacopladas)
 Utilizado para isolar e encapsular regras de negócio e validações individuais de lances. Isso evita o acúmulo de IFs aninhados nos serviços e simplifica a escrita de testes de unidade:
