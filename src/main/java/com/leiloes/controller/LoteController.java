@@ -1,10 +1,12 @@
 package com.leiloes.controller;
 
 import com.leiloes.dto.input.LoteInput;
-import com.leiloes.repository.BemRepository;
-import com.leiloes.repository.UsuarioRepository;
+import com.leiloes.exception.UsuarioNaoEncontradoException;
 import com.leiloes.service.LoteService;
+import com.leiloes.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/lotes")
 public class LoteController {
 
-    private final LoteService loteService;
-    private final UsuarioRepository usuarioRepository;
-    private final BemRepository bemRepository;
+    private static final Logger log = LoggerFactory.getLogger(LoteController.class);
 
-    public LoteController(LoteService loteService, UsuarioRepository usuarioRepository, BemRepository bemRepository) {
+    private final LoteService loteService;
+    private final UsuarioService usuarioService;
+
+    public LoteController(LoteService loteService, UsuarioService usuarioService) {
         this.loteService = loteService;
-        this.usuarioRepository = usuarioRepository;
-        this.bemRepository = bemRepository;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
@@ -33,28 +35,34 @@ public class LoteController {
     @GetMapping("/novo")
     public String exibirFormularioCadastro(Model model) {
         model.addAttribute("lote", new LoteInput(null, null, null, null));
-        model.addAttribute("usuarios", usuarioRepository.findAll());
-        model.addAttribute("bens", bemRepository.findAll());
+        model.addAttribute("usuarios", usuarioService.listarTodos());
+        model.addAttribute("bens", loteService.listarBens());
         return "lotes/form";
     }
 
     @PostMapping("/novo")
     public String cadastrar(@ModelAttribute("lote") @Valid LoteInput input, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("usuarios", usuarioRepository.findAll());
-            model.addAttribute("bens", bemRepository.findAll());
+            model.addAttribute("usuarios", usuarioService.listarTodos());
+            model.addAttribute("bens", loteService.listarBens());
             return "lotes/form";
         }
-        
+
         try {
             loteService.cadastrar(input);
-        } catch (Exception ex) {
+        } catch (UsuarioNaoEncontradoException | IllegalArgumentException ex) {
             model.addAttribute("erro", ex.getMessage());
-            model.addAttribute("usuarios", usuarioRepository.findAll());
-            model.addAttribute("bens", bemRepository.findAll());
+            model.addAttribute("usuarios", usuarioService.listarTodos());
+            model.addAttribute("bens", loteService.listarBens());
+            return "lotes/form";
+        } catch (Exception ex) {
+            log.error("Erro inesperado ao cadastrar lote", ex);
+            model.addAttribute("erro", "Ocorreu um erro inesperado. Tente novamente.");
+            model.addAttribute("usuarios", usuarioService.listarTodos());
+            model.addAttribute("bens", loteService.listarBens());
             return "lotes/form";
         }
-        
+
         return "redirect:/lotes";
     }
 

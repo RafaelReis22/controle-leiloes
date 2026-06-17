@@ -13,6 +13,7 @@ import com.leiloes.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,6 +31,7 @@ public class LoteService {
 
     @Transactional
     public void cadastrar(LoteInput input) {
+        // guarda defensiva: @NotEmpty no DTO cobre o caminho web, mas protege chamadas diretas ao service
         if (input.idsBens() == null || input.idsBens().isEmpty()) {
             throw new IllegalArgumentException("O lote deve possuir pelo menos um bem.");
         }
@@ -54,12 +56,19 @@ public class LoteService {
         loteRepository.save(lote);
     }
 
+    @Transactional(readOnly = true)
     public List<LoteResumo> listarTodos() {
         return loteRepository.listarTodosComoResumo();
     }
 
+    @Transactional(readOnly = true)
     public Lote buscar(Long id) {
         return loteRepository.findById(id)
                 .orElseThrow(() -> new LoteNaoEncontradoException(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Bem> listarBens() {
+        return Collections.unmodifiableList(bemRepository.findAll());
     }
 }

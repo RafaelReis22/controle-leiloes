@@ -18,7 +18,8 @@ public class LanceAcimaDoMinimoSpec implements Specification<Leilao> {
 
     @Override
     public boolean isSatisfiedBy(Leilao leilao) {
-        if (leilao == null || leilao.getLote() == null || leilao.getLote().getPrecoMinimo() == null) {
+        if (leilao == null || leilao.getLote() == null || leilao.getLote().getPrecoMinimo() == null
+                || this.valorDoLance == null) {
             return false;
         }
         return this.valorDoLance.compareTo(leilao.getLote().getPrecoMinimo()) >= 0;

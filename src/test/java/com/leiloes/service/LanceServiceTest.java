@@ -10,6 +10,7 @@ import com.leiloes.dto.output.LanceDetalhe;
 import com.leiloes.exception.LanceInvalidoException;
 import com.leiloes.exception.LeilaoNaoEmAndamentoException;
 import com.leiloes.exception.LeilaoNaoEncontradoException;
+import com.leiloes.exception.UsuarioNaoEncontradoException;
 import com.leiloes.repository.LanceRepository;
 import com.leiloes.repository.LeilaoRepository;
 import com.leiloes.repository.UsuarioRepository;
@@ -128,6 +129,16 @@ class LanceServiceTest {
         // 200 < 300 (lance atual) → inválido
         assertThatThrownBy(() -> lanceService.registrarLance(new LanceInput(leilao.getId(), lanceante.getId(), new BigDecimal("200.00"))))
                 .isInstanceOf(LanceInvalidoException.class);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
+        Leilao leilao = criarLeilaoEmAndamento(TipoLeilao.ABERTO);
+        when(leilaoRepository.findByIdForUpdate(leilao.getId())).thenReturn(Optional.of(leilao));
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> lanceService.registrarLance(new LanceInput(leilao.getId(), 99L, BigDecimal.valueOf(200))))
+                .isInstanceOf(UsuarioNaoEncontradoException.class);
     }
 
     @Test

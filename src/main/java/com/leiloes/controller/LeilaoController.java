@@ -1,10 +1,14 @@
 package com.leiloes.controller;
 
 import com.leiloes.dto.input.LeilaoInput;
-import com.leiloes.repository.UsuarioRepository;
+import com.leiloes.exception.LoteNaoEncontradoException;
+import com.leiloes.exception.UsuarioNaoEncontradoException;
 import com.leiloes.service.LeilaoService;
 import com.leiloes.service.LoteService;
+import com.leiloes.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,14 +18,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/leiloes")
 public class LeilaoController {
 
+    private static final Logger log = LoggerFactory.getLogger(LeilaoController.class);
+
     private final LeilaoService leilaoService;
     private final LoteService loteService;
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public LeilaoController(LeilaoService leilaoService, LoteService loteService, UsuarioRepository usuarioRepository) {
+    public LeilaoController(LeilaoService leilaoService, LoteService loteService, UsuarioService usuarioService) {
         this.leilaoService = leilaoService;
         this.loteService = loteService;
-        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
@@ -34,7 +40,7 @@ public class LeilaoController {
     public String exibirFormularioCadastro(Model model) {
         model.addAttribute("leilao", new LeilaoInput(null, null, null, null, null));
         model.addAttribute("lotes", loteService.listarTodos());
-        model.addAttribute("usuarios", usuarioRepository.findAll());
+        model.addAttribute("usuarios", usuarioService.listarTodos());
         return "leiloes/form";
     }
 
@@ -42,19 +48,25 @@ public class LeilaoController {
     public String cadastrar(@ModelAttribute("leilao") @Valid LeilaoInput input, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("lotes", loteService.listarTodos());
-            model.addAttribute("usuarios", usuarioRepository.findAll());
+            model.addAttribute("usuarios", usuarioService.listarTodos());
             return "leiloes/form";
         }
-        
+
         try {
             leilaoService.cadastrar(input);
-        } catch (Exception ex) {
+        } catch (LoteNaoEncontradoException | UsuarioNaoEncontradoException | IllegalArgumentException ex) {
             model.addAttribute("erro", ex.getMessage());
             model.addAttribute("lotes", loteService.listarTodos());
-            model.addAttribute("usuarios", usuarioRepository.findAll());
+            model.addAttribute("usuarios", usuarioService.listarTodos());
+            return "leiloes/form";
+        } catch (Exception ex) {
+            log.error("Erro inesperado ao cadastrar leilão", ex);
+            model.addAttribute("erro", "Ocorreu um erro inesperado. Tente novamente.");
+            model.addAttribute("lotes", loteService.listarTodos());
+            model.addAttribute("usuarios", usuarioService.listarTodos());
             return "leiloes/form";
         }
-        
+
         return "redirect:/leiloes";
     }
 
