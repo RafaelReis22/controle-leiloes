@@ -25,59 +25,36 @@ psql --version
 
 ---
 
-## Passo a Passo para Rodar
+## 🚀 Como rodar o projeto do jeito mais fácil
 
-### Passo 1 — Criar o banco de dados
+Se você está usando o Windows e ferramentas visuais como **IntelliJ, Eclipse, VS Code** e **pgAdmin**, siga estes passos simples:
 
-Abra o **terminal** e execute:
+### Passo 1 — Preparar o Banco de Dados (PostgreSQL)
 
-```bash
-psql -U postgres -c "CREATE DATABASE leiloes_db;"
-```
+1. Abra o **pgAdmin** (ou DBeaver).
+2. Crie um novo banco de dados vazio chamado `leiloes_db`.
+3. Pronto! Não precisa criar as tabelas manualmente. Quando você rodar o projeto, o próprio sistema vai se encarregar de criar todas as tabelas e já preencher com os dados de teste (usuários e leilões) automaticamente!
 
-> **Dica (Windows):** se o comando `psql` não for reconhecido, abra o **pgAdmin** e execute o SQL acima no Query Tool.
+### Passo 2 — Conferir a senha do Banco no Projeto
 
----
-
-### Passo 2 — Criar as tabelas e popular com dados de teste
-
-Dentro da pasta raiz do projeto, execute os dois comandos abaixo em ordem:
-
-```bash
-psql -U postgres -d leiloes_db -f db/schema.sql
-psql -U postgres -d leiloes_db -f db/seed.sql
-```
-
-> **Dica (pgAdmin / DBeaver):** selecione o banco `leiloes_db`, abra o Query Tool e execute o conteúdo dos arquivos `db/schema.sql` e depois `db/seed.sql`.
-
-O `seed.sql` insere automaticamente:
-- 4 usuários (compradores e leiloeiro)
-- Categorias, bens e lotes (incluindo lote com múltiplos bens)
-- 4 leilões com lances já cadastrados (aberto/fechado, em andamento/encerrado)
-
----
-
-### Passo 3 — Configurar a senha do PostgreSQL
-
-Abra o arquivo `src/main/resources/application.properties` e ajuste a senha:
-
+1. Dentro da sua IDE, abra o arquivo `src/main/resources/application.properties`.
+2. Confirme se as credenciais estão iguais às do seu PostgreSQL. Já deixamos configurado assim para você:
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/leiloes_db
 spring.datasource.username=postgres
-spring.datasource.password=SUA_SENHA_AQUI
+spring.datasource.password=maneger
 ```
+*(Altere a senha `maneger` caso a do seu computador seja diferente)*
 
----
+### Passo 3 — Rodar o Projeto pela IDE
 
-### Passo 4 — Iniciar a aplicação
+Como rodar pelo terminal pode gerar erro se o Maven/Java não estiverem configurados no Windows, **o jeito mais garantido é rodar usando a sua própria IDE**:
 
-Na pasta raiz do projeto, execute:
+- **No Eclipse:** Clique com o botão direito no projeto > `Run As` > `Spring Boot App` (ou `Java Application` na classe principal).
+- **No IntelliJ:** Encontre o arquivo `ControleLeiloesApplication.java` (na pasta `src/main/java/...`), clique com o botão direito nele e escolha `Run 'ControleLeiloesApplication'`.
+- **No VS Code:** Abra a classe `ControleLeiloesApplication.java` e clique no botão de `Run` que aparece acima do método `main`.
 
-```bash
-mvn spring-boot:run
-```
-
-Aguarde a mensagem `Started ControleLeiloesApplication` no terminal.
+Aguarde o console mostrar que a aplicação iniciou (`Started ControleLeiloesApplication`).
 
 ---
 
