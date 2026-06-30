@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/leiloes/{id}/lance")
@@ -39,7 +40,8 @@ public class LanceController {
     @PostMapping
     public String registrarLance(@PathVariable("id") Long idLeilao,
                                  @ModelAttribute("lance") @Valid LanceInput input,
-                                 BindingResult bindingResult, Model model) {
+                                 BindingResult bindingResult, Model model,
+                                 RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("usuarios", usuarioService.listarTodos());
             model.addAttribute("idLeilao", idLeilao);
@@ -61,6 +63,7 @@ public class LanceController {
             return "lances/form";
         }
 
+        redirectAttributes.addFlashAttribute("sucesso", "Lance registrado com sucesso!");
         return "redirect:/leiloes/" + idLeilao;
     }
 }

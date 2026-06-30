@@ -57,6 +57,15 @@
             return isNaN(num) ? '' : num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        function syncToHidden() {
+            let val = display.value.replace(/[R$\s]/g, '').trim();
+            if (!val) { hidden.value = ''; return; }
+            if (val.includes(',')) val = val.replace(/\./g, '').replace(',', '.');
+            const num = parseFloat(val);
+            if (isNaN(num) || num < 0) { hidden.value = ''; return; }
+            hidden.value = num.toFixed(2);
+        }
+
         if (hidden.value) display.value = toDisplay(hidden.value);
 
         display.addEventListener('focus', function () {
@@ -72,6 +81,8 @@
             hidden.value = num.toFixed(2);
             this.value = num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         });
+
+        display.closest('form').addEventListener('submit', syncToHidden);
     })();
     </script>
 </body>
