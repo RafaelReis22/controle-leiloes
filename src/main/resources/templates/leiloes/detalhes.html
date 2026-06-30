@@ -118,6 +118,14 @@
                             <span class="meta-value price" style="font-size: 1.35rem;" th:text="${#numbers.formatCurrency(leilao.precoMinimo)}">R$ 0,00</span>
                         </div>
 
+                        <!-- Lance atual visível apenas em leilões abertos em andamento -->
+                        <div th:if="${leilao.tipo.name() == 'ABERTO' and leilao.status.name() == 'EM_ANDAMENTO'}">
+                            <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Lance Atual (maior oferta)</span>
+                            <span th:if="${leilao.lancesVisiveis.empty}" style="font-size: 1.1rem; color: var(--text-secondary);">Nenhum lance ainda</span>
+                            <span th:unless="${leilao.lancesVisiveis.empty}" class="meta-value price" style="font-size: 1.35rem; color: var(--color-warning);"
+                                  th:text="${#numbers.formatCurrency(leilao.lancesVisiveis[0].valor)}">R$ 0,00</span>
+                        </div>
+
                         <div>
                             <span class="meta-label" style="display: block; font-size: 0.8rem; margin-bottom: 0.25rem;">Modalidade</span>
                             <span class="meta-value" style="font-size: 1rem;" th:text="'LEILÃO ' + ${leilao.tipo}">Tipo</span>
