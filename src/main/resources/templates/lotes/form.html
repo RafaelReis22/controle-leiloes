@@ -34,7 +34,7 @@
 
                 <div class="form-group">
                     <label for="idResponsavel" class="form-label">Usuário Responsável</label>
-                    <select id="idResponsavel" th:field="*{idResponsavel}" class="form-control">
+                    <select id="idResponsavel" th:field="*{idResponsavel}" class="form-control" required>
                         <option value="" disabled selected>Selecione o usuário responsável...</option>
                         <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome} + ' (CPF/CNPJ: ' + ${usuario.cpfCnpj} + ')'">Usuário</option>
                     </select>

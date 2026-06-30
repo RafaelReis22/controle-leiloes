@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/lotes")
 public class LoteController {
@@ -34,7 +36,7 @@ public class LoteController {
 
     @GetMapping("/novo")
     public String exibirFormularioCadastro(Model model) {
-        model.addAttribute("lote", new LoteInput(null, null, null, null));
+        model.addAttribute("lote", new LoteInput(null, null, null, List.of()));
         model.addAttribute("usuarios", usuarioService.listarTodos());
         model.addAttribute("bens", loteService.listarBens());
         return "lotes/form";

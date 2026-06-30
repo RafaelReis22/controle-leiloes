@@ -22,7 +22,7 @@
                 
                 <div class="form-group">
                     <label for="tipo" class="form-label">Tipo do Leilão</label>
-                    <select id="tipo" th:field="*{tipo}" class="form-control">
+                    <select id="tipo" th:field="*{tipo}" class="form-control" required>
                         <option value="" disabled selected>Selecione o tipo do leilão...</option>
                         <option value="ABERTO">ABERTO (Lances visíveis durante o andamento)</option>
                         <option value="FECHADO">FECHADO (Lances ocultos até o encerramento)</option>
@@ -32,7 +32,7 @@
 
                 <div class="form-group">
                     <label for="idLote" class="form-label">Lote a ser Leiloado</label>
-                    <select id="idLote" th:field="*{idLote}" class="form-control">
+                    <select id="idLote" th:field="*{idLote}" class="form-control" required>
                         <option value="" disabled selected>Selecione o lote...</option>
                         <option th:each="lote : ${lotes}" th:value="${lote.id}" th:text="'Lote #' + ${lote.id} + ' - ' + ${lote.descricao} + ' (Preço Mínimo: ' + ${#numbers.formatCurrency(lote.precoMinimo)} + ')'">Lote</option>
                     </select>
@@ -41,7 +41,7 @@
 
                 <div class="form-group">
                     <label for="idResponsavel" class="form-label">Usuário Responsável (Leiloeiro)</label>
-                    <select id="idResponsavel" th:field="*{idResponsavel}" class="form-control">
+                    <select id="idResponsavel" th:field="*{idResponsavel}" class="form-control" required>
                         <option value="" disabled selected>Selecione o leiloeiro...</option>
                         <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome} + ' (CPF/CNPJ: ' + ${usuario.cpfCnpj} + ')'">Usuário</option>
                     </select>

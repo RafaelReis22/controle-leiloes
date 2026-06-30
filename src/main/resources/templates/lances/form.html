@@ -24,7 +24,7 @@
 
                 <div class="form-group">
                     <label for="idUsuario" class="form-label">Selecione seu Usuário</label>
-                    <select id="idUsuario" th:field="*{idUsuario}" class="form-control">
+                    <select id="idUsuario" th:field="*{idUsuario}" class="form-control" required>
                         <option value="" disabled selected>Quem está dando o lance...</option>
                         <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome} + ' (CPF/CNPJ: ' + ${usuario.cpfCnpj} + ')'">Usuário</option>
                     </select>
